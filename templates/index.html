@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>accnet. | Advanced Asset Audit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="branding">accnet.</div>
+            <div class="sub-branding">Asset Audit & Network Intelligence</div>
+        </div>
+
+        <div class="search-box">
+            <div class="currency-selector">
+                <div class="curr-label">Currency Node</div>
+                <div class="curr-options">
+                    <button id="btn-rbx" class="curr-btn active" onclick="setCurrency('RBX')">R$</button>
+                    <button id="btn-usd" class="curr-btn" onclick="setCurrency('USD')">USD</button>
+                    <button id="btn-idr" class="curr-btn" onclick="setCurrency('IDR')">IDR</button>
+                </div>
+            </div>
+            <div class="search-wrapper">
+                <input type="text" id="username" placeholder="Search Roblox username..." spellcheck="false"
+                    inputmode="search" autocomplete="off">
+                <button onclick="performAudit()">ANALYZE</button>
+            </div>
+            <div id="status-msg" class="hidden" style="margin-top: 15px; font-size: 12px; color: var(--accent);">
+                <div class="loader"></div> SYNCHRONIZING WITH ROBLOX NODES...
+            </div>
+        </div>
+
+        <div id="dashboard" class="hidden">
+            <div class="profile-card">
+                <a id="user-roblox-link" href="#" target="_blank" class="corner-link" title="Open Roblox Profile">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                </a>
+                <div class="avatar-container">
+                    <img id="user-avatar" class="avatar" src="">
+                    <div class="status-badge"></div>
+                </div>
+                <div class="user-info">
+                    <h2 id="display-name">---</h2>
+                    <div id="roblox-id" class="user-id">UID: 000000</div>
+                    <div class="networth-label" style="margin-top:20px;">ESTIMATED NETWORTH (RAP)</div>
+                    <div id="total-networth" class="networth-val">
+                        <svg class="rbx-icon" viewBox="0 0 91.99 100.06"
+                            style="width:24px; height:24px; vertical-align:middle; fill:#00ff88; margin-top:-4px;">
+                            <path
+                                d="M82,17.72A19.94,19.94,0,0,1,92,35V65.08A19.92,19.92,0,0,1,82,82.33L56,97.39a19.94,19.94,0,0,1-19.91,0L10,82.33A19.91,19.91,0,0,1,0,65.08V35A19.93,19.93,0,0,1,10,17.72L36,2.67A19.89,19.89,0,0,1,56,2.67ZM39.53,9.5,14.13,24.17a12.92,12.92,0,0,0-6.46,11.2V64.69a12.93,12.93,0,0,0,6.46,11.2l25.4,14.66a12.93,12.93,0,0,0,12.93,0l25.4-14.66a12.93,12.93,0,0,0,6.46-11.2V35.37a12.92,12.92,0,0,0-6.46-11.2L52.46,9.5a12.93,12.93,0,0,0-12.93,0ZM51.3,17.7l20,11.56a10.64,10.64,0,0,1,5.32,9.21V61.6a10.61,10.61,0,0,1-5.32,9.2l-20,11.57a10.61,10.61,0,0,1-10.62,0l-20-11.57a10.6,10.6,0,0,1-5.31-9.2V38.47a10.63,10.63,0,0,1,5.31-9.21l20-11.56a10.61,10.61,0,0,1,10.62,0ZM34.5,61.53h23v-23h-23Z" />
+                        </svg>
+                        <span id="networth-amt">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RAP History Chart -->
+            <div class="chart-section">
+                <div class="chart-header">
+                    <span>◈</span> NETWORK INTELLIGENCE: RAP ANALYSIS (7D TREND)
+                </div>
+                <div id="rap-chart"></div>
+            </div>
+
+            <h3 class="section-title">Top Asset Inventory</h3>
+            <div id="inventory-grid" class="grid"></div>
+
+            <div id="private-msg" class="private-alert hidden">
+                <strong>ACCESS DENIED</strong><br>
+                <span style="font-size: 12px; opacity: 0.8;">Target inventory is set to private. Cannot retrieve
+                    non-public assets.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Error Modal -->
+    <div id="error-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-icon">✕</div>
+            <div class="modal-title">ACCESS_ERROR</div>
+            <div id="modal-message" class="modal-text">User could not be found in the network.</div>
+            <button class="modal-btn" onclick="closeErrorModal()">DISMISS</button>
+        </div>
+    </div>
+
+    <script>
+        let appState = {
+            currency: 'RBX',
+            data: null,
+            rates: {
+                USD: 0.007, // Middle ground rate
+                IDR: 110   // Rp 110 per Robux
+            }
+        };
+
+        function setCurrency(curr) {
+            appState.currency = curr;
+            document.querySelectorAll('.curr-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${curr.toLowerCase()}`).classList.add('active');
+            if (appState.data) updateDisplay();
+        }
+
+        function formatValue(robux) {
+            if (appState.currency === 'USD') return '$' + (robux * appState.rates.USD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (appState.currency === 'IDR') return 'Rp' + (robux * appState.rates.IDR).toLocaleString();
+            return robux.toLocaleString();
+        }
+
+        async function performAudit() {
+            const username = document.getElementById('username').value.trim();
+            if (!username) return;
+
+            const statusMsg = document.getElementById('status-msg');
+            const dashboard = document.getElementById('dashboard');
+            const privateMsg = document.getElementById('private-msg');
+
+            // Reset UI
+            statusMsg.classList.remove('hidden');
+            dashboard.classList.add('hidden');
+            privateMsg.classList.add('hidden');
+
+            try {
+                const response = await fetch('/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                });
+
+                if (!response.ok) throw new Error("User not found");
+
+                appState.data = await response.json();
+                updateDisplay();
+                dashboard.classList.remove('hidden');
+            } catch (err) {
+                console.error(err);
+                showErrorModal(err.message || "An unexpected error occurred.");
+            } finally {
+                statusMsg.classList.add('hidden');
+            }
+        }
+
+        function updateDisplay() {
+            const data = appState.data;
+            const grid = document.getElementById('inventory-grid');
+            grid.innerHTML = '';
+
+            // Populate Profile
+            document.getElementById('user-avatar').src = data.avatar;
+            document.getElementById('display-name').innerHTML = `${data.name.toUpperCase()} <span style="font-size:14px; opacity:0.5; font-weight:400;">(@${data.username})</span>`;
+            document.getElementById('roblox-id').innerText = `UID: ${data.id}`;
+            document.getElementById('user-roblox-link').href = `https://www.roblox.com/users/${data.id}/profile`;
+
+            const networthLabel = appState.currency === 'RBX' ? 'ESTIMATED NETWORTH (RAP)' : `ESTIMATED NETWORTH (${appState.currency})`;
+            document.querySelector('.networth-label').innerText = networthLabel;
+            document.getElementById('networth-amt').innerText = formatValue(data.networth);
+
+            if (data.private) {
+                document.getElementById('private-msg').classList.remove('hidden');
+                document.getElementById('networth-amt').innerText = "RESTRICTED";
+            } else {
+                // Update Chart with converted data
+                const chartData = data.history.map(v => appState.currency === 'RBX' ? v : (v * appState.rates[appState.currency]));
+                renderChart(chartData);
+
+                // Populate Items
+                data.items.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+
+                    let tagType = 'tag-limited';
+                    let tagLabel = item.serial ? 'Limited U' : 'Limited';
+                    if (item.serial) tagType = 'tag-unique';
+
+                    card.innerHTML = `
+                        <a href="https://www.roblox.com/catalog/${item.assetId}" target="_blank" class="corner-link" title="Open Catalog Link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </a>
+                        <div class="item-tags">
+                            <span class="tag ${tagType}">${tagLabel}</span>
+                            ${item.serial ? `<div class="serial">${item.serial}</div>` : ''}
+                        </div>
+                        <img src="${item.image}" class="item-thumb" alt="asset">
+                        <span class="demand-tag demand-${item.demand.toLowerCase()}">${item.demand}</span>
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-price">
+                            ${appState.currency === 'RBX' ? '<svg viewBox="0 0 91.99 100.06" style="width:14px; height:14px; fill:#00ff88; vertical-align:middle; margin-top:-2px;"><path d="M82,17.72A19.94,19.94,0,0,1,92,35V65.08A19.92,19.92,0,0,1,82,82.33L56,97.39a19.94,19.94,0,0,1-19.91,0L10,82.33A19.91,19.91,0,0,1,0,65.08V35A19.93,19.93,0,0,1,10,17.72L36,2.67A19.89,19.89,0,0,1,56,2.67ZM39.53,9.5,14.13,24.17a12.92,12.92,0,0,0-6.46,11.2V64.69a12.93,12.93,0,0,0,6.46,11.2l25.4,14.66a12.93,12.93,0,0,0,12.93,0l25.4-14.66a12.93,12.93,0,0,0,6.46-11.2V35.37a12.92,12.92,0,0,0-6.46-11.2L52.46,9.5a12.93,12.93,0,0,0-12.93,0ZM51.3,17.7l20,11.56a10.64,10.64,0,0,1,5.32,9.21V61.6a10.61,10.61,0,0,1-5.32,9.2l-20,11.57a10.61,10.61,0,0,1-10.62,0l-20-11.57a10.6,10.6,0,0,1-5.31-9.2V38.47a10.63,10.63,0,0,1,5.31-9.21l20-11.56a10.61,10.61,0,0,1,10.62,0ZM34.5,61.53h23v-23h-23Z"/></svg>' : ''}
+                            ${formatValue(item.price)}
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        function showErrorModal(message) {
+            document.getElementById('modal-message').innerText = message;
+            document.getElementById('error-modal').classList.add('active');
+        }
+
+        function closeErrorModal() {
+            document.getElementById('error-modal').classList.remove('active');
+        }
+
+        let chart;
+        function renderChart(historyData) {
+            const options = {
+                series: [{
+                    name: appState.currency + ' Value',
+                    data: historyData
+                }],
+                chart: {
+                    height: 200,
+                    type: 'area',
+                    toolbar: { show: false },
+                    zoom: { enabled: false },
+                    background: 'transparent'
+                },
+                colors: ['#00d4ff'],
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.4,
+                        opacityTo: 0.1,
+                        stops: [0, 90, 100]
+                    }
+                },
+                dataLabels: { enabled: false },
+                stroke: { curve: 'smooth', width: 2 },
+                grid: {
+                    borderColor: '#1a1a1a',
+                    strokeDashArray: 4,
+                    yaxis: { lines: { show: true } }
+                },
+                xaxis: {
+                    categories: ['6D AGO', '5D AGO', '4D AGO', '3D AGO', '2D AGO', 'YESTERDAY', 'NOW'],
+                    axisBorder: { show: false },
+                    axisTicks: { show: false },
+                    labels: { style: { colors: '#444', fontSize: '9px' } }
+                },
+                yaxis: {
+                    labels: {
+                        formatter: val => formatValue(val / (appState.currency === 'RBX' ? 1 : appState.rates[appState.currency])),
+                        style: { colors: '#444', fontSize: '9px' }
+                    }
+                },
+                tooltip: {
+                    theme: 'dark',
+                    x: { show: false },
+                    y: { formatter: val => formatValue(val / (appState.currency === 'RBX' ? 1 : appState.rates[appState.currency])) }
+                }
+            };
+
+            if (chart) chart.destroy();
+            chart = new ApexCharts(document.querySelector("#rap-chart"), options);
+            chart.render();
+        }
+
+        // Enter key support
+        document.getElementById('username').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performAudit();
+        });
+    </script>
+
+</body>
+
+</html>
