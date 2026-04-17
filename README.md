@@ -9,8 +9,6 @@
 
 Dashboard audit aset Roblox berperforma tinggi yang dirancang khusus untuk trader **Limited**. Dapatkan analisis kekayaan bersih (Networth) secara instan dengan metrik pasar real-time.
 
-![Dashboard Preview](https://via.placeholder.com/800x400?text=accnet.+Advanced+Asset+Audit+Preview)
-
 ## 🚀 Fitur Utama
 
 - 🔍 **Limited-Only Audit**: Fokus 100% pada item Limited untuk perhitungan Networth yang akurat.
