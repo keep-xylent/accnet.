@@ -6,7 +6,7 @@
 ![Repo Size](https://img.shields.io/github/repo-size/keep-xylent/accnet.?style=for-the-badge)
 
 ##  Open Dashboard  
-🔗 https://xylent-accnet.hf.space/
+- https://xylent-accnet.hf.space/
 
 Dashboard audit aset Roblox berperforma tinggi yang dirancang khusus untuk trader **Limited**. Dapatkan analisis kekayaan bersih (Networth) secara instan dengan metrik pasar real-time.
 
