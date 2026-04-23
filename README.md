@@ -1,4 +1,4 @@
-# accnet. | Advanced Roblox Asset Audit ◈
+# accnet. | Account Value Checker
 ![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Hugging Face](https://img.shields.io/badge/HuggingFace-Spaces-FFCC4D?style=for-the-badge&logo=huggingface&logoColor=black)
 ![Repo Size](https://img.shields.io/github/repo-size/keep-xylent/accnet.?style=for-the-badge)
@@ -20,7 +20,7 @@ Dashboard audit aset Roblox berperforma tinggi yang dirancang khusus untuk trade
 ## 🛠️ Teknologi
 
 - **Backend**: Python, Flask
-- **Frontend**: Vanilla JS, CSS3 (Glassmorphism), HTML5
+- **Frontend**: Vanilla JS, CSS, HTML5
 - **Charts**: ApexCharts
 - **APIs**: Roblox Web APIs, Rolimons Item API
 
