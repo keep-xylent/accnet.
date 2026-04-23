@@ -1,10 +1,9 @@
 # accnet. | Account Value Checker
 ![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Hugging Face](https://img.shields.io/badge/HuggingFace-Spaces-FFCC4D?style=for-the-badge&logo=huggingface&logoColor=black)
 ![Repo Size](https://img.shields.io/github/repo-size/keep-xylent/accnet.?style=for-the-badge)
 
-##  Open Dashboard  
-- https://xylent-accnet.hf.space/
+##  Preview
+[![Hugging Face](https://img.shields.io/badge/HuggingFace-Spaces-FFCC4D?style=for-the-badge&logo=huggingface&logoColor=black)](https://xylent-accnet.hf.space/)
 
 Dashboard audit aset Roblox berperforma tinggi yang dirancang khusus untuk trader **Limited**. Dapatkan analisis kekayaan bersih (Networth) secara instan dengan metrik pasar real-time.
 
