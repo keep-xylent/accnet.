@@ -2,9 +2,7 @@
 
 <div align="center">
 
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
-![Repo Size](https://img.shields.io/github/repo-size/keep-xylent/accnet.?style=for-the-badge&color=ff007f)
+![Repo Size](https://img.shields.io/github/repo-size/keep-xylent/accnet?style=for-the-badge&color=ff007f)
 [![Live Preview](https://img.shields.io/badge/Live_Preview-007bff?style=for-the-badge&logo=chainlink&logoColor=white)](https://xylent-accnet.hf.space/)
 
 *Platform analitik networth akun Roblox yang akurat, cepat, dan aman.*
